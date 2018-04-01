@@ -5,12 +5,17 @@
  */
 package desafio;
 
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,12 +34,17 @@ import javax.swing.JOptionPane;
 public class Ahorcado extends javax.swing.JFrame {
 
     private ArrayList<String> lista_letras;
+    private int intentos, puntos, aciertos;
     /**
      * Creates new form Ahorcado
      */
     public Ahorcado() {
         initComponents();
         lista_letras = new ArrayList();
+        
+        intentos = 1;
+        
+        puntos = 0;
         
         ImageIcon imagen = new ImageIcon(getClass().getResource("imagenes//im1.jpg"));
         Limagen.setIcon(imagen);
@@ -123,30 +133,110 @@ public class Ahorcado extends javax.swing.JFrame {
     }
     
     /**
-     * comprobamos que la letra seleccionada esta en el array
-     * @param letra letra a comprobar
-     * @return devuelve si esta o no la letra
-     */
-    private boolean letraEsta(String letra){
-        boolean esta = false;
-        for (int i = 0; i < lista_letras.size(); i++) {
-            if (lista_letras.get(i).toLowerCase().equals(letra)) {
-                esta = true;
-            }
-        }
-        return esta;
-    }
-    
-    /**
      * modificamos el JLabel para poner su letra
      * @param letra letra a poner
      */
     private void insertarLetra(String letra){
+        int n_letras = 0;
         for (int i = 0; i < lista_letras.size(); i++) {
             if (lista_letras.get(i).toUpperCase().equals(letra)) {
+                n_letras++;
                 JLabel L = (JLabel) PpalabraSecreta.getComponent(i);
                 L.setText(letra);
             }
+        }
+        
+        if (n_letras == 0) {
+            Ltexto.setText("La letra "+letra+" no esta en la palabra");
+            modificarImagen();
+        }
+        else{
+            Ltexto.setText("La palabra contiene "+n_letras+ " "+letra);
+            aciertos++;
+            puntosAciertos(false);
+        }
+    }
+    
+    /**
+     * modifica la imagen del ahorcado al fallar
+     */
+    private void modificarImagen(){
+        intentos++;
+        ImageIcon i = new ImageIcon(getClass().getResource("imagenes//im"+intentos+".jpg"));
+        Limagen.setIcon(i);
+        if (intentos == 6) {
+            String palabra = "";
+            for (int j = 0; j < lista_letras.size(); j++) {
+                palabra += lista_letras.get(j);
+            }
+            JOptionPane.showMessageDialog(this, "Has perdido la palabra era "+palabra);
+            Component b[] = Pletras.getComponents();
+            
+            for (int j = 0; j < b.length; j++) {
+                b[j].setEnabled(false);
+            }
+        }
+    }
+    
+    /**
+     * nos da puntos por resolver la palabra o letras de esta
+     * @param resolucion nos dice si la palabra fue resuelta de golpe
+     */
+    private void puntosAciertos(boolean resolucion){
+        if (!resolucion) {
+            puntos += lista_letras.size();
+        }
+        else{
+            puntos += (lista_letras.size()*(lista_letras.size()-aciertos));
+        }
+        Lpuntuacion.setText("Puntuacion: "+puntos);
+        
+        if (aciertos == lista_letras.size() || resolucion) {
+            Component b[] = Pletras.getComponents();
+            
+            for (int j = 0; j < b.length; j++) {
+                b[j].setEnabled(false);
+            }
+            String opciones[] = {"si","no"};
+            int seguir =  JOptionPane.showOptionDialog(this, "acertaste la palabra ¿otra partida?"
+                    + "", "Fin de ", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[1]);
+            if (seguir == 0) {
+                nuevaPartida(false);
+            }
+            
+        }
+        
+    }
+    
+    /**
+     * creamos una nueva partida
+     * @param eliminar especificamos si queremos comenzar de nuevo o mantener puntuacion
+     * 
+     */
+    private void nuevaPartida(boolean eliminar){
+        lista_letras.removeAll(lista_letras);
+        
+        System.out.println(lista_letras);
+        
+        if (eliminar) {
+            puntos = 0;
+        }
+        
+        aciertos = 0;
+        
+        intentos = 0;
+        
+        ImageIcon imagen = new ImageIcon(getClass().getResource("imagenes//im1.jpg"));
+        Limagen.setIcon(imagen);
+        
+        Ltexto.setText("");
+        
+        PpalabraSecreta.removeAll();
+        
+        Component b[] = Pletras.getComponents();
+        
+        for (int j = 0; j < b.length; j++) {
+            b[j].setEnabled(true);
         }
     }
     /**
@@ -174,7 +264,7 @@ public class Ahorcado extends javax.swing.JFrame {
         jPanel7 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         Bresolver = new javax.swing.JButton();
-        jPanel10 = new javax.swing.JPanel();
+        Pletras = new javax.swing.JPanel();
         BA = new javax.swing.JButton();
         BB = new javax.swing.JButton();
         BC = new javax.swing.JButton();
@@ -266,11 +356,16 @@ public class Ahorcado extends javax.swing.JFrame {
         jPanel9.setLayout(new java.awt.GridLayout(1, 0));
 
         Bresolver.setText("Resolver");
+        Bresolver.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BresolverActionPerformed(evt);
+            }
+        });
         jPanel9.add(Bresolver);
 
         jPanel7.add(jPanel9, java.awt.BorderLayout.NORTH);
 
-        jPanel10.setLayout(new java.awt.GridLayout(6, 6));
+        Pletras.setLayout(new java.awt.GridLayout(6, 6));
 
         BA.setText("A");
         BA.addActionListener(new java.awt.event.ActionListener() {
@@ -278,7 +373,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BAActionPerformed(evt);
             }
         });
-        jPanel10.add(BA);
+        Pletras.add(BA);
 
         BB.setText("B");
         BB.addActionListener(new java.awt.event.ActionListener() {
@@ -286,7 +381,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BBActionPerformed(evt);
             }
         });
-        jPanel10.add(BB);
+        Pletras.add(BB);
 
         BC.setText("C");
         BC.addActionListener(new java.awt.event.ActionListener() {
@@ -294,7 +389,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BCActionPerformed(evt);
             }
         });
-        jPanel10.add(BC);
+        Pletras.add(BC);
 
         BD.setText("D");
         BD.addActionListener(new java.awt.event.ActionListener() {
@@ -302,7 +397,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BDActionPerformed(evt);
             }
         });
-        jPanel10.add(BD);
+        Pletras.add(BD);
 
         BE.setText("E");
         BE.addActionListener(new java.awt.event.ActionListener() {
@@ -310,7 +405,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BEActionPerformed(evt);
             }
         });
-        jPanel10.add(BE);
+        Pletras.add(BE);
 
         BF.setText("F");
         BF.addActionListener(new java.awt.event.ActionListener() {
@@ -318,7 +413,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BFActionPerformed(evt);
             }
         });
-        jPanel10.add(BF);
+        Pletras.add(BF);
 
         BG.setText("G");
         BG.addActionListener(new java.awt.event.ActionListener() {
@@ -326,7 +421,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BGActionPerformed(evt);
             }
         });
-        jPanel10.add(BG);
+        Pletras.add(BG);
 
         BH.setText("H");
         BH.addActionListener(new java.awt.event.ActionListener() {
@@ -334,7 +429,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BHActionPerformed(evt);
             }
         });
-        jPanel10.add(BH);
+        Pletras.add(BH);
 
         BI.setText("I");
         BI.addActionListener(new java.awt.event.ActionListener() {
@@ -342,7 +437,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BIActionPerformed(evt);
             }
         });
-        jPanel10.add(BI);
+        Pletras.add(BI);
 
         BJ.setText("J");
         BJ.addActionListener(new java.awt.event.ActionListener() {
@@ -350,7 +445,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BJActionPerformed(evt);
             }
         });
-        jPanel10.add(BJ);
+        Pletras.add(BJ);
 
         BK.setText("K");
         BK.addActionListener(new java.awt.event.ActionListener() {
@@ -358,7 +453,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BKActionPerformed(evt);
             }
         });
-        jPanel10.add(BK);
+        Pletras.add(BK);
 
         BL.setText("L");
         BL.addActionListener(new java.awt.event.ActionListener() {
@@ -366,7 +461,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BLActionPerformed(evt);
             }
         });
-        jPanel10.add(BL);
+        Pletras.add(BL);
 
         BM.setText("M");
         BM.addActionListener(new java.awt.event.ActionListener() {
@@ -374,7 +469,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BMActionPerformed(evt);
             }
         });
-        jPanel10.add(BM);
+        Pletras.add(BM);
 
         BN.setText("N");
         BN.addActionListener(new java.awt.event.ActionListener() {
@@ -382,7 +477,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BNActionPerformed(evt);
             }
         });
-        jPanel10.add(BN);
+        Pletras.add(BN);
 
         Bñ.setText("ñ");
         Bñ.addActionListener(new java.awt.event.ActionListener() {
@@ -390,7 +485,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BñActionPerformed(evt);
             }
         });
-        jPanel10.add(Bñ);
+        Pletras.add(Bñ);
 
         BO.setText("O");
         BO.addActionListener(new java.awt.event.ActionListener() {
@@ -398,7 +493,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BOActionPerformed(evt);
             }
         });
-        jPanel10.add(BO);
+        Pletras.add(BO);
 
         BP.setText("P");
         BP.addActionListener(new java.awt.event.ActionListener() {
@@ -406,7 +501,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BPActionPerformed(evt);
             }
         });
-        jPanel10.add(BP);
+        Pletras.add(BP);
 
         BQ.setText("Q");
         BQ.addActionListener(new java.awt.event.ActionListener() {
@@ -414,7 +509,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BQActionPerformed(evt);
             }
         });
-        jPanel10.add(BQ);
+        Pletras.add(BQ);
 
         BR.setText("R");
         BR.addActionListener(new java.awt.event.ActionListener() {
@@ -422,7 +517,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BRActionPerformed(evt);
             }
         });
-        jPanel10.add(BR);
+        Pletras.add(BR);
 
         BS.setText("S");
         BS.addActionListener(new java.awt.event.ActionListener() {
@@ -430,7 +525,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BSActionPerformed(evt);
             }
         });
-        jPanel10.add(BS);
+        Pletras.add(BS);
 
         BT.setText("T");
         BT.addActionListener(new java.awt.event.ActionListener() {
@@ -438,7 +533,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BTActionPerformed(evt);
             }
         });
-        jPanel10.add(BT);
+        Pletras.add(BT);
 
         BU.setText("U");
         BU.addActionListener(new java.awt.event.ActionListener() {
@@ -446,7 +541,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BUActionPerformed(evt);
             }
         });
-        jPanel10.add(BU);
+        Pletras.add(BU);
 
         BV.setText("V");
         BV.addActionListener(new java.awt.event.ActionListener() {
@@ -454,7 +549,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BVActionPerformed(evt);
             }
         });
-        jPanel10.add(BV);
+        Pletras.add(BV);
 
         BW.setText("W");
         BW.addActionListener(new java.awt.event.ActionListener() {
@@ -462,7 +557,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BWActionPerformed(evt);
             }
         });
-        jPanel10.add(BW);
+        Pletras.add(BW);
 
         BX.setText("X");
         BX.addActionListener(new java.awt.event.ActionListener() {
@@ -470,7 +565,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BXActionPerformed(evt);
             }
         });
-        jPanel10.add(BX);
+        Pletras.add(BX);
 
         BY.setText("Y");
         BY.addActionListener(new java.awt.event.ActionListener() {
@@ -478,7 +573,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 BYActionPerformed(evt);
             }
         });
-        jPanel10.add(BY);
+        Pletras.add(BY);
 
         BZ.setText("Z");
         BZ.addActionListener(new java.awt.event.ActionListener() {
@@ -486,9 +581,9 @@ public class Ahorcado extends javax.swing.JFrame {
                 BZActionPerformed(evt);
             }
         });
-        jPanel10.add(BZ);
+        Pletras.add(BZ);
 
-        jPanel7.add(jPanel10, java.awt.BorderLayout.CENTER);
+        jPanel7.add(Pletras, java.awt.BorderLayout.CENTER);
 
         jPanel5.add(jPanel7, java.awt.BorderLayout.CENTER);
 
@@ -515,10 +610,21 @@ public class Ahorcado extends javax.swing.JFrame {
 
         MenuNuevaPartida.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
         MenuNuevaPartida.setText("Nueva partida");
+        MenuNuevaPartida.setToolTipText("reinicia el juego");
+        MenuNuevaPartida.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuNuevaPartidaActionPerformed(evt);
+            }
+        });
         jMenu1.add(MenuNuevaPartida);
 
         MenuGuardar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
         MenuGuardar.setText("Guardar partida");
+        MenuGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuGuardarActionPerformed(evt);
+            }
+        });
         jMenu1.add(MenuGuardar);
 
         MenuCargar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
@@ -555,166 +661,204 @@ public class Ahorcado extends javax.swing.JFrame {
     }//GEN-LAST:event_MenuInformacionActionPerformed
 
     private void BBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BBActionPerformed
-        if (letraEsta("b")) {
-            insertarLetra("B");
-        }
+        insertarLetra("B");
+        BB.setEnabled(false);
     }//GEN-LAST:event_BBActionPerformed
 
     private void BAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BAActionPerformed
-        if (letraEsta("a")) {
-            insertarLetra("A");
-        }
+        insertarLetra("A");
+        BA.setEnabled(false);
     }//GEN-LAST:event_BAActionPerformed
 
     private void BCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BCActionPerformed
-        if (letraEsta("c")) {
-            insertarLetra("C");
-        }
+        insertarLetra("C");
+        BC.setEnabled(false);
     }//GEN-LAST:event_BCActionPerformed
 
     private void BDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BDActionPerformed
-        if (letraEsta("d")) {
-            insertarLetra("D");
-        }
+        insertarLetra("D");
+        BD.setEnabled(false);
     }//GEN-LAST:event_BDActionPerformed
 
     private void BEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEActionPerformed
-        if (letraEsta("e")) {
-            insertarLetra("E");
-        }
+        insertarLetra("E");
+        BE.setEnabled(false);
     }//GEN-LAST:event_BEActionPerformed
 
     private void BFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BFActionPerformed
-        if (letraEsta("f")) {
-            insertarLetra("F");
-        }
+        insertarLetra("F");
+        BF.setEnabled(false);
     }//GEN-LAST:event_BFActionPerformed
 
     private void BGActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BGActionPerformed
-        if (letraEsta("g")) {
-            insertarLetra("G");
-        }
+        insertarLetra("G");
+        BG.setEnabled(false);
     }//GEN-LAST:event_BGActionPerformed
 
     private void BHActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BHActionPerformed
-        if (letraEsta("h")) {
-            insertarLetra("H");
-        }
+        insertarLetra("H");
+        BH.setEnabled(false);
     }//GEN-LAST:event_BHActionPerformed
 
     private void BIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BIActionPerformed
-        if (letraEsta("i")) {
-            insertarLetra("I");
-        }
+        insertarLetra("I");
+        BI.setEnabled(false);
     }//GEN-LAST:event_BIActionPerformed
 
     private void BJActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BJActionPerformed
-        if (letraEsta("j")) {
-            insertarLetra("J");
-        }
+        insertarLetra("J");
+        BJ.setEnabled(false);
     }//GEN-LAST:event_BJActionPerformed
 
     private void BKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BKActionPerformed
-        if (letraEsta("k")) {
-            insertarLetra("K");
-        }
+        insertarLetra("K");
+        BK.setEnabled(false);
     }//GEN-LAST:event_BKActionPerformed
 
     private void BLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BLActionPerformed
-       if (letraEsta("l")) {
-            insertarLetra("L");
-        }
+       insertarLetra("L");
+        BL.setEnabled(false);
     }//GEN-LAST:event_BLActionPerformed
 
     private void BMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BMActionPerformed
-        if (letraEsta("m")) {
-            insertarLetra("M");
-        }
+       insertarLetra("M");
+        BM.setEnabled(false);
     }//GEN-LAST:event_BMActionPerformed
 
     private void BNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BNActionPerformed
-       if (letraEsta("n")) {
-            insertarLetra("N");
-        }
+       insertarLetra("N");
+        BN.setEnabled(false);
     }//GEN-LAST:event_BNActionPerformed
 
     private void BñActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BñActionPerformed
-        if (letraEsta("ñ")) {
-            insertarLetra("Ñ");
-        }
+        insertarLetra("Ñ");
+        Bñ.setEnabled(false);
     }//GEN-LAST:event_BñActionPerformed
 
     private void BOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BOActionPerformed
-       if (letraEsta("o")) {
-            insertarLetra("O");
-        }
+       insertarLetra("O");
+        BO.setEnabled(false);
     }//GEN-LAST:event_BOActionPerformed
 
     private void BPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BPActionPerformed
-        if (letraEsta("p")) {
-            insertarLetra("P");
-        }
+        insertarLetra("P");
+        BP.setEnabled(false);
     }//GEN-LAST:event_BPActionPerformed
 
     private void BQActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BQActionPerformed
-        if (letraEsta("q")) {
-            insertarLetra("Q");
-        }
+        insertarLetra("Q");
+        BQ.setEnabled(false);
     }//GEN-LAST:event_BQActionPerformed
 
     private void BRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BRActionPerformed
-        if (letraEsta("r")) {
-            insertarLetra("R");
-        }
+        insertarLetra("R");
+        BR.setEnabled(false);
     }//GEN-LAST:event_BRActionPerformed
 
     private void BSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BSActionPerformed
-        if (letraEsta("s")) {
-            insertarLetra("S");
-        }
+        insertarLetra("S");
+        BS.setEnabled(false);
     }//GEN-LAST:event_BSActionPerformed
 
     private void BTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BTActionPerformed
-        if (letraEsta("t")) {
-            insertarLetra("T");
-        }
+        insertarLetra("T");
+        BT.setEnabled(false);
     }//GEN-LAST:event_BTActionPerformed
 
     private void BUActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BUActionPerformed
-        if (letraEsta("u")) {
-            insertarLetra("U");
-        }
+        insertarLetra("U");
+        BU.setEnabled(false);
     }//GEN-LAST:event_BUActionPerformed
 
     private void BVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BVActionPerformed
-        if (letraEsta("v")) {
-            insertarLetra("V");
-        }
+        insertarLetra("V");
+        BV.setEnabled(false);
     }//GEN-LAST:event_BVActionPerformed
 
     private void BWActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BWActionPerformed
-        if (letraEsta("w")) {
-            insertarLetra("W");
-        }
+        insertarLetra("W");
+        BW.setEnabled(false);
     }//GEN-LAST:event_BWActionPerformed
 
     private void BXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BXActionPerformed
-        if (letraEsta("x")) {
-            insertarLetra("X");
-        }
+        insertarLetra("X");
+        BX.setEnabled(false);
     }//GEN-LAST:event_BXActionPerformed
 
     private void BYActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BYActionPerformed
-        if (letraEsta("y")) {
-            insertarLetra("Y");
-        }
+        insertarLetra("Y");
+        BY.setEnabled(false);
     }//GEN-LAST:event_BYActionPerformed
 
     private void BZActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BZActionPerformed
-        if (letraEsta("z")) {
-            insertarLetra("Z");
-        }
+        insertarLetra("Z");
+        BZ.setEnabled(false);
     }//GEN-LAST:event_BZActionPerformed
+
+    private void BresolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BresolverActionPerformed
+        String palabra[] = TFresolver.getText().split("");
+        boolean solucion = true;
+        
+        for (int i = 0; i < lista_letras.size(); i++) {
+            if (!lista_letras.get(i).toLowerCase().equals(palabra[i].toLowerCase())) {
+                solucion = false;
+            }
+        }
+        
+        if (solucion) {
+            puntosAciertos(true);
+            for (int i = 0; i < PpalabraSecreta.getComponentCount(); i++) {
+                JLabel j = (JLabel) PpalabraSecreta.getComponent(i);
+                j.setText(lista_letras.get(i).toUpperCase());
+            }
+        }
+        else{
+            modificarImagen();
+            JOptionPane.showMessageDialog(this, "palabra incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        TFresolver.setText("");
+    }//GEN-LAST:event_BresolverActionPerformed
+
+    private void MenuNuevaPartidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuNuevaPartidaActionPerformed
+        nuevaPartida(true);
+    }//GEN-LAST:event_MenuNuevaPartidaActionPerformed
+
+    private void MenuGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuGuardarActionPerformed
+        Partida p = new Partida(puntos, intentos, aciertos, lista_letras);
+        Calendar c = new GregorianCalendar();
+        
+        String hora = c.get(Calendar.HOUR_OF_DAY)+"-";
+        String minuto = c.get(Calendar.MINUTE)+"-";
+        String segundo = ""+c.get(Calendar.SECOND);
+        
+        String nombre_fichero = "Partida_"+Lnombre.getText()+"_"+c.get(Calendar.YEAR)+"_"+(c.get(Calendar.MONTH)+1)+"_hora_"+hora + minuto + segundo+".sav";
+        
+        File archivo = null;
+        FileOutputStream flujo = null;
+        ObjectOutputStream guardar = null;
+        
+        try{
+            archivo = new File("Partidas//"+nombre_fichero);
+            flujo = new FileOutputStream(archivo);
+            guardar = new ObjectOutputStream(flujo);
+            
+            guardar.writeObject(p);
+        
+        } catch (FileNotFoundException ex) {
+            System.out.println(nombre_fichero);
+            JOptionPane.showMessageDialog(this, "fallo en flujo de datos", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "fallo al guardar", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        finally{
+            try {
+                guardar.close();
+                flujo.close();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "fallo al cerrar flujo o guardar", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_MenuGuardarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -791,13 +935,13 @@ public class Ahorcado extends javax.swing.JFrame {
     private javax.swing.JMenuItem MenuGuardar;
     private javax.swing.JMenuItem MenuInformacion;
     private javax.swing.JMenuItem MenuNuevaPartida;
+    private javax.swing.JPanel Pletras;
     private javax.swing.JPanel PpalabraSecreta;
     private javax.swing.JTextField TFresolver;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
