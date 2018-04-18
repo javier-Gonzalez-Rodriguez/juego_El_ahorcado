@@ -6,12 +6,16 @@
 package desafio;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,21 +24,26 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
- * Ciclo formativo: Desarrollo de Aplicaciones Multiplataforma 
- * Módulo profesional: Programación Reto número 2 
- * Alumno: Javier Gonzalez Rodriguez
- * Curso académico: 2017-2018 
- * Instituto Tecnológico Poniente
+ * Ciclo formativo: Desarrollo de Aplicaciones Multiplataforma Módulo
+ * profesional: Programación Reto número 2 Alumno: Javier Gonzalez Rodriguez
+ * Curso académico: 2017-2018 Instituto Tecnológico Poniente
+ *
  * @author javier
  */
 public class Ahorcado extends javax.swing.JFrame {
+    
+    private ArrayList<String> lista_letras, letras_acertadas;
+    private int intentos, puntos, aciertos, h , m, s;
+    private Timer tiempo;
 
-    private ArrayList<String> lista_letras;
-    private int intentos, puntos, aciertos;
     /**
      * Creates new form Ahorcado
      */
@@ -42,6 +51,7 @@ public class Ahorcado extends javax.swing.JFrame {
         initComponents();
         lista_letras = new ArrayList();
         
+        letras_acertadas = new ArrayList();
         intentos = 1;
         
         puntos = 0;
@@ -52,34 +62,57 @@ public class Ahorcado extends javax.swing.JFrame {
         String nombre;
         
         nombre = (String) JOptionPane.showInputDialog(this, null, "Introduce tu nombre", JOptionPane.PLAIN_MESSAGE, icon, null, null);
-        if (nombre == null ||nombre.equals("") ) {
+        if (nombre == null || nombre.equals("")) {
             nombre = "Sin nombre";
         }
         
         Lnombre.setText(nombre);
         
         buscarPalabra();
+        
+        h = 0;
+        m = 0;
+        s = 0;
+        System.out.println(lista_letras);
+        
+        tiempo = new Timer(1000, accion);
+        tiempo.start();
     }
 
+    private ActionListener accion = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            s++;
+            if (s == 60) {
+                s = 0;
+                m++;
+            }
+            if (m == 60) {
+                m = 0;
+                h++;
+            }
+            cronometro();
+        }
+    };
     /**
-     * 
-     * busca una palabra 
-     * 
+     *
+     * busca una palabra
+     *
      */
-    private void buscarPalabra(){
+    private void buscarPalabra() {
         Random aleatorio = new Random();
         File archivo = null;
         FileReader flujo = null;
         BufferedReader leer = null;
         
         String palabra = "";
-        try{
+        try {
             archivo = new File("palabras.txt");
             flujo = new FileReader(archivo);
             leer = new BufferedReader(flujo);
             int contador = 1;
             
-            while((palabra = leer.readLine()) != null){
+            while ((palabra = leer.readLine()) != null) {
                 contador++;
             }
             int num = aleatorio.nextInt(contador);
@@ -90,8 +123,7 @@ public class Ahorcado extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "error al leer palabra");
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "error");
-        }
-        finally{
+        } finally {
             try {
                 leer.close();
                 flujo.close();
@@ -100,18 +132,19 @@ public class Ahorcado extends javax.swing.JFrame {
             }
         }
     }
-    
+
     /**
      * seleccionamos una palabra
+     *
      * @param num posicion de la palabra en el documento
-     * 
+     *
      */
-    private void palabraSeleccionada(int num){
+    private void palabraSeleccionada(int num) {
         String p = "";
         File archivo = null;
         FileReader flujo = null;
         BufferedReader leer = null;
-        try{
+        try {
             archivo = new File("palabras.txt");
             flujo = new FileReader(archivo);
             leer = new BufferedReader(flujo);
@@ -122,6 +155,7 @@ public class Ahorcado extends javax.swing.JFrame {
             for (int i = 0; i < letras.length; i++) {
                 lista_letras.add(letras[i]);
                 PpalabraSecreta.add(new JLabel("_"));
+                letras_acertadas.add("_");
             }
             
         } catch (FileNotFoundException ex) {
@@ -131,45 +165,46 @@ public class Ahorcado extends javax.swing.JFrame {
         }
         
     }
-    
+
     /**
      * modificamos el JLabel para poner su letra
+     *
      * @param letra letra a poner
      */
-    private void insertarLetra(String letra){
+    private void insertarLetra(String letra) {
         int n_letras = 0;
         for (int i = 0; i < lista_letras.size(); i++) {
             if (lista_letras.get(i).toUpperCase().equals(letra)) {
                 n_letras++;
                 JLabel L = (JLabel) PpalabraSecreta.getComponent(i);
                 L.setText(letra);
+                letras_acertadas.set(i, letra);
             }
         }
         
         if (n_letras == 0) {
-            Ltexto.setText("La letra "+letra+" no esta en la palabra");
+            Ltexto.setText("La letra " + letra + " no esta en la palabra");
             modificarImagen();
-        }
-        else{
-            Ltexto.setText("La palabra contiene "+n_letras+ " "+letra);
-            aciertos++;
+        } else {
+            Ltexto.setText("La palabra contiene " + n_letras + " " + letra);
+            aciertos += n_letras;
             puntosAciertos(false);
         }
     }
-    
+
     /**
      * modifica la imagen del ahorcado al fallar
      */
-    private void modificarImagen(){
+    private void modificarImagen() {
         intentos++;
-        ImageIcon i = new ImageIcon(getClass().getResource("imagenes//im"+intentos+".jpg"));
+        ImageIcon i = new ImageIcon(getClass().getResource("imagenes//im" + intentos + ".jpg"));
         Limagen.setIcon(i);
         if (intentos == 6) {
             String palabra = "";
             for (int j = 0; j < lista_letras.size(); j++) {
                 palabra += lista_letras.get(j);
             }
-            JOptionPane.showMessageDialog(this, "Has perdido la palabra era "+palabra);
+            JOptionPane.showMessageDialog(this, "Has perdido la palabra era " + palabra);
             Component b[] = Pletras.getComponents();
             
             for (int j = 0; j < b.length; j++) {
@@ -177,46 +212,47 @@ public class Ahorcado extends javax.swing.JFrame {
             }
         }
     }
-    
+
     /**
      * nos da puntos por resolver la palabra o letras de esta
+     *
      * @param resolucion nos dice si la palabra fue resuelta de golpe
      */
-    private void puntosAciertos(boolean resolucion){
+    private void puntosAciertos(boolean resolucion) {
         if (!resolucion) {
             puntos += lista_letras.size();
+        } else {
+            puntos += (lista_letras.size() * (lista_letras.size() - aciertos));
         }
-        else{
-            puntos += (lista_letras.size()*(lista_letras.size()-aciertos));
-        }
-        Lpuntuacion.setText("Puntuacion: "+puntos);
-        
+        Lpuntuacion.setText("Puntuacion: " + puntos);
+        System.out.println(aciertos);
         if (aciertos == lista_letras.size() || resolucion) {
             Component b[] = Pletras.getComponents();
             
             for (int j = 0; j < b.length; j++) {
                 b[j].setEnabled(false);
             }
-            String opciones[] = {"si","no"};
-            int seguir =  JOptionPane.showOptionDialog(this, "acertaste la palabra ¿otra partida?"
+            String opciones[] = {"si", "no"};
+            int seguir = JOptionPane.showOptionDialog(this, "acertaste la palabra ¿otra partida?"
                     + "", "Fin de ", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[1]);
             if (seguir == 0) {
                 nuevaPartida(false);
             }
             
         }
-        
+        //lista_letras, letras_acertadas
     }
-    
+
     /**
      * creamos una nueva partida
-     * @param eliminar especificamos si queremos comenzar de nuevo o mantener puntuacion
-     * 
+     *
+     * @param eliminar especificamos si queremos comenzar de nuevo o mantener
+     * puntuacion
+     *
      */
-    private void nuevaPartida(boolean eliminar){
+    private void nuevaPartida(boolean eliminar) {
         lista_letras.removeAll(lista_letras);
-        
-        System.out.println(lista_letras);
+        letras_acertadas.removeAll(letras_acertadas);
         
         if (eliminar) {
             puntos = 0;
@@ -238,7 +274,13 @@ public class Ahorcado extends javax.swing.JFrame {
         for (int j = 0; j < b.length; j++) {
             b[j].setEnabled(true);
         }
+        buscarPalabra();
+        h = 0;
+        s = 0;
+        m = 0;
+        System.out.println(lista_letras);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -251,7 +293,7 @@ public class Ahorcado extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         Limagen = new javax.swing.JLabel();
         Ltexto = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
+        Pdatos = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         LnombreJuego = new javax.swing.JLabel();
@@ -279,7 +321,7 @@ public class Ahorcado extends javax.swing.JFrame {
         BL = new javax.swing.JButton();
         BM = new javax.swing.JButton();
         BN = new javax.swing.JButton();
-        Bñ = new javax.swing.JButton();
+        BÑ = new javax.swing.JButton();
         BO = new javax.swing.JButton();
         BP = new javax.swing.JButton();
         BQ = new javax.swing.JButton();
@@ -322,8 +364,8 @@ public class Ahorcado extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.WEST);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jPanel2.setLayout(new java.awt.BorderLayout());
+        Pdatos.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        Pdatos.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.BorderLayout());
 
@@ -335,7 +377,6 @@ public class Ahorcado extends javax.swing.JFrame {
 
         jPanel5.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setBorder(null);
         jPanel6.setLayout(new java.awt.BorderLayout());
 
         PpalabraSecreta.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Palabra secreta", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Dialog", 1, 12))); // NOI18N
@@ -368,6 +409,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.setLayout(new java.awt.GridLayout(6, 6));
 
         BA.setText("A");
+        BA.setFocusable(false);
         BA.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BAActionPerformed(evt);
@@ -376,6 +418,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BA);
 
         BB.setText("B");
+        BB.setFocusable(false);
         BB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BBActionPerformed(evt);
@@ -384,6 +427,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BB);
 
         BC.setText("C");
+        BC.setFocusable(false);
         BC.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BCActionPerformed(evt);
@@ -392,6 +436,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BC);
 
         BD.setText("D");
+        BD.setFocusable(false);
         BD.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BDActionPerformed(evt);
@@ -400,6 +445,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BD);
 
         BE.setText("E");
+        BE.setFocusable(false);
         BE.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BEActionPerformed(evt);
@@ -408,6 +454,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BE);
 
         BF.setText("F");
+        BF.setFocusable(false);
         BF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BFActionPerformed(evt);
@@ -416,6 +463,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BF);
 
         BG.setText("G");
+        BG.setFocusable(false);
         BG.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BGActionPerformed(evt);
@@ -424,6 +472,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BG);
 
         BH.setText("H");
+        BH.setFocusable(false);
         BH.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BHActionPerformed(evt);
@@ -432,6 +481,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BH);
 
         BI.setText("I");
+        BI.setFocusable(false);
         BI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BIActionPerformed(evt);
@@ -440,6 +490,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BI);
 
         BJ.setText("J");
+        BJ.setFocusable(false);
         BJ.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BJActionPerformed(evt);
@@ -448,6 +499,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BJ);
 
         BK.setText("K");
+        BK.setFocusable(false);
         BK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BKActionPerformed(evt);
@@ -456,6 +508,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BK);
 
         BL.setText("L");
+        BL.setFocusable(false);
         BL.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BLActionPerformed(evt);
@@ -464,6 +517,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BL);
 
         BM.setText("M");
+        BM.setFocusable(false);
         BM.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BMActionPerformed(evt);
@@ -472,6 +526,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BM);
 
         BN.setText("N");
+        BN.setFocusable(false);
         BN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BNActionPerformed(evt);
@@ -479,15 +534,17 @@ public class Ahorcado extends javax.swing.JFrame {
         });
         Pletras.add(BN);
 
-        Bñ.setText("ñ");
-        Bñ.addActionListener(new java.awt.event.ActionListener() {
+        BÑ.setText("Ñ");
+        BÑ.setFocusable(false);
+        BÑ.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BñActionPerformed(evt);
+                BÑActionPerformed(evt);
             }
         });
-        Pletras.add(Bñ);
+        Pletras.add(BÑ);
 
         BO.setText("O");
+        BO.setFocusable(false);
         BO.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BOActionPerformed(evt);
@@ -496,6 +553,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BO);
 
         BP.setText("P");
+        BP.setFocusable(false);
         BP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BPActionPerformed(evt);
@@ -504,6 +562,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BP);
 
         BQ.setText("Q");
+        BQ.setFocusable(false);
         BQ.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BQActionPerformed(evt);
@@ -512,6 +571,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BQ);
 
         BR.setText("R");
+        BR.setFocusable(false);
         BR.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BRActionPerformed(evt);
@@ -520,6 +580,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BR);
 
         BS.setText("S");
+        BS.setFocusable(false);
         BS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BSActionPerformed(evt);
@@ -528,6 +589,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BS);
 
         BT.setText("T");
+        BT.setFocusable(false);
         BT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BTActionPerformed(evt);
@@ -536,6 +598,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BT);
 
         BU.setText("U");
+        BU.setFocusable(false);
         BU.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BUActionPerformed(evt);
@@ -544,6 +607,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BU);
 
         BV.setText("V");
+        BV.setFocusable(false);
         BV.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BVActionPerformed(evt);
@@ -552,6 +616,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BV);
 
         BW.setText("W");
+        BW.setFocusable(false);
         BW.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BWActionPerformed(evt);
@@ -560,6 +625,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BW);
 
         BX.setText("X");
+        BX.setFocusable(false);
         BX.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BXActionPerformed(evt);
@@ -568,6 +634,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BX);
 
         BY.setText("Y");
+        BY.setFocusable(false);
         BY.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BYActionPerformed(evt);
@@ -576,6 +643,7 @@ public class Ahorcado extends javax.swing.JFrame {
         Pletras.add(BY);
 
         BZ.setText("Z");
+        BZ.setFocusable(false);
         BZ.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BZActionPerformed(evt);
@@ -589,9 +657,9 @@ public class Ahorcado extends javax.swing.JFrame {
 
         jPanel3.add(jPanel5, java.awt.BorderLayout.CENTER);
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
+        Pdatos.add(jPanel3, java.awt.BorderLayout.CENTER);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+        getContentPane().add(Pdatos, java.awt.BorderLayout.CENTER);
 
         jPanel11.setLayout(new java.awt.GridLayout(1, 0));
 
@@ -629,6 +697,11 @@ public class Ahorcado extends javax.swing.JFrame {
 
         MenuCargar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
         MenuCargar.setText("Cargar partida");
+        MenuCargar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuCargarActionPerformed(evt);
+            }
+        });
         jMenu1.add(MenuCargar);
 
         jMenuBar1.add(jMenu1);
@@ -657,7 +730,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 + "<b>Curso: </b> 2017-2018 <br>"
                 + "<b>Reto: </b> reto numero 2 <br>"
                 + "<b>INTITUTO TECNOLOGICO PONIENTE</b> <br>"
-                + "<img src="+imagen+"></html>");
+                + "<img src=" + imagen + "></html>");
     }//GEN-LAST:event_MenuInformacionActionPerformed
 
     private void BBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BBActionPerformed
@@ -666,133 +739,134 @@ public class Ahorcado extends javax.swing.JFrame {
     }//GEN-LAST:event_BBActionPerformed
 
     private void BAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BAActionPerformed
-        insertarLetra("A");
         BA.setEnabled(false);
+        insertarLetra("A");
     }//GEN-LAST:event_BAActionPerformed
 
     private void BCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BCActionPerformed
-        insertarLetra("C");
         BC.setEnabled(false);
+        insertarLetra("C");
     }//GEN-LAST:event_BCActionPerformed
 
     private void BDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BDActionPerformed
-        insertarLetra("D");
         BD.setEnabled(false);
+        insertarLetra("D");
     }//GEN-LAST:event_BDActionPerformed
 
     private void BEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEActionPerformed
-        insertarLetra("E");
         BE.setEnabled(false);
+        insertarLetra("E");
     }//GEN-LAST:event_BEActionPerformed
 
     private void BFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BFActionPerformed
-        insertarLetra("F");
         BF.setEnabled(false);
+        insertarLetra("F");
     }//GEN-LAST:event_BFActionPerformed
 
     private void BGActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BGActionPerformed
-        insertarLetra("G");
         BG.setEnabled(false);
+        insertarLetra("G");
+        
     }//GEN-LAST:event_BGActionPerformed
 
     private void BHActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BHActionPerformed
-        insertarLetra("H");
         BH.setEnabled(false);
+        insertarLetra("H");
     }//GEN-LAST:event_BHActionPerformed
 
     private void BIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BIActionPerformed
-        insertarLetra("I");
         BI.setEnabled(false);
+        insertarLetra("I");
     }//GEN-LAST:event_BIActionPerformed
 
     private void BJActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BJActionPerformed
-        insertarLetra("J");
         BJ.setEnabled(false);
+        insertarLetra("J");
     }//GEN-LAST:event_BJActionPerformed
 
     private void BKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BKActionPerformed
-        insertarLetra("K");
         BK.setEnabled(false);
+        insertarLetra("K");
     }//GEN-LAST:event_BKActionPerformed
 
     private void BLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BLActionPerformed
-       insertarLetra("L");
         BL.setEnabled(false);
+        insertarLetra("L");
     }//GEN-LAST:event_BLActionPerformed
 
     private void BMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BMActionPerformed
-       insertarLetra("M");
         BM.setEnabled(false);
+        insertarLetra("M");
     }//GEN-LAST:event_BMActionPerformed
 
     private void BNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BNActionPerformed
-       insertarLetra("N");
         BN.setEnabled(false);
+        insertarLetra("N");
     }//GEN-LAST:event_BNActionPerformed
 
-    private void BñActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BñActionPerformed
+    private void BÑActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BÑActionPerformed
+        BÑ.setEnabled(false);
         insertarLetra("Ñ");
-        Bñ.setEnabled(false);
-    }//GEN-LAST:event_BñActionPerformed
+    }//GEN-LAST:event_BÑActionPerformed
 
     private void BOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BOActionPerformed
-       insertarLetra("O");
         BO.setEnabled(false);
+        insertarLetra("O");
     }//GEN-LAST:event_BOActionPerformed
 
     private void BPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BPActionPerformed
-        insertarLetra("P");
         BP.setEnabled(false);
+        insertarLetra("P");
     }//GEN-LAST:event_BPActionPerformed
 
     private void BQActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BQActionPerformed
-        insertarLetra("Q");
         BQ.setEnabled(false);
+        insertarLetra("Q");
     }//GEN-LAST:event_BQActionPerformed
 
     private void BRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BRActionPerformed
-        insertarLetra("R");
         BR.setEnabled(false);
+        insertarLetra("R");
     }//GEN-LAST:event_BRActionPerformed
 
     private void BSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BSActionPerformed
-        insertarLetra("S");
         BS.setEnabled(false);
+        insertarLetra("S");
     }//GEN-LAST:event_BSActionPerformed
 
     private void BTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BTActionPerformed
-        insertarLetra("T");
         BT.setEnabled(false);
+        insertarLetra("T");
     }//GEN-LAST:event_BTActionPerformed
 
     private void BUActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BUActionPerformed
-        insertarLetra("U");
         BU.setEnabled(false);
+        insertarLetra("U");
     }//GEN-LAST:event_BUActionPerformed
 
     private void BVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BVActionPerformed
-        insertarLetra("V");
         BV.setEnabled(false);
+        insertarLetra("V");
     }//GEN-LAST:event_BVActionPerformed
 
     private void BWActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BWActionPerformed
-        insertarLetra("W");
         BW.setEnabled(false);
+        insertarLetra("W");
     }//GEN-LAST:event_BWActionPerformed
 
     private void BXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BXActionPerformed
-        insertarLetra("X");
         BX.setEnabled(false);
+        insertarLetra("X");
     }//GEN-LAST:event_BXActionPerformed
 
     private void BYActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BYActionPerformed
-        insertarLetra("Y");
         BY.setEnabled(false);
+        insertarLetra("Y");
     }//GEN-LAST:event_BYActionPerformed
 
     private void BZActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BZActionPerformed
-        insertarLetra("Z");
         BZ.setEnabled(false);
+        insertarLetra("Z");
     }//GEN-LAST:event_BZActionPerformed
 
     private void BresolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BresolverActionPerformed
@@ -811,8 +885,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 JLabel j = (JLabel) PpalabraSecreta.getComponent(i);
                 j.setText(lista_letras.get(i).toUpperCase());
             }
-        }
-        else{
+        } else {
             modificarImagen();
             JOptionPane.showMessageDialog(this, "palabra incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -824,42 +897,121 @@ public class Ahorcado extends javax.swing.JFrame {
     }//GEN-LAST:event_MenuNuevaPartidaActionPerformed
 
     private void MenuGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuGuardarActionPerformed
-        Partida p = new Partida(puntos, intentos, aciertos, lista_letras);
+        tiempo.stop();
+        Partida p = new Partida(puntos, intentos, aciertos, lista_letras, letras_acertadas, Lnombre.getText(), Limagen, h, m, s);
         Calendar c = new GregorianCalendar();
         
-        String hora = c.get(Calendar.HOUR_OF_DAY)+"-";
-        String minuto = c.get(Calendar.MINUTE)+"-";
-        String segundo = ""+c.get(Calendar.SECOND);
+        String hora = c.get(Calendar.HOUR_OF_DAY) + "-";
+        String minuto = c.get(Calendar.MINUTE) + "-";
+        String segundo = "" + c.get(Calendar.SECOND);
         
-        String nombre_fichero = "Partida_"+Lnombre.getText()+"_"+c.get(Calendar.YEAR)+"_"+(c.get(Calendar.MONTH)+1)+"_hora_"+hora + minuto + segundo+".sav";
+        String nombre_fichero = "Partida_" + Lnombre.getText() + "_" + c.get(Calendar.YEAR) + "_" + (c.get(Calendar.MONTH) + 1) + "_hora_" + hora + minuto + segundo + ".sav";
         
         File archivo = null;
         FileOutputStream flujo = null;
         ObjectOutputStream guardar = null;
         
-        try{
-            archivo = new File("Partidas//"+nombre_fichero);
+        try {
+            archivo = new File("Partidas//" + nombre_fichero);
             flujo = new FileOutputStream(archivo);
             guardar = new ObjectOutputStream(flujo);
             
             guardar.writeObject(p);
-        
+            
         } catch (FileNotFoundException ex) {
-            System.out.println(nombre_fichero);
             JOptionPane.showMessageDialog(this, "fallo en flujo de datos", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "fallo al guardar", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        finally{
+        } finally {
             try {
                 guardar.close();
                 flujo.close();
+                JOptionPane.showMessageDialog(this, "partida guardada con exito");
+                tiempo.start();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "fallo al cerrar flujo o guardar", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_MenuGuardarActionPerformed
 
+    private void MenuCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuCargarActionPerformed
+        
+        FileInputStream flujo = null;
+        ObjectInputStream cargar = null;
+        
+        Partida p = null;
+        
+        JFileChooser archivo = new JFileChooser("Partidas");
+        
+        archivo.setFileFilter(new FileNameExtensionFilter("archivo de partida", "sav"));
+        
+        int i = archivo.showOpenDialog(null);
+        if (i == JFileChooser.APPROVE_OPTION) {
+            try {
+                flujo = new FileInputStream(archivo.getSelectedFile());
+                cargar = new ObjectInputStream(flujo);
+                p = (Partida) cargar.readObject();
+                
+            } catch (FileNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, "fallo al cargar datos", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "archivo corrupto", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (ClassNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, "fallo al cargar", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            finally{
+                try {
+                    cargar.close();
+                    flujo.close();
+                    aciertos = p.getAciertos();
+                    puntos = p.getPuntuacion();
+                    Lpuntuacion.setText("Puntuacion: " + puntos);
+                    intentos = p.getIntentos();
+                    lista_letras = p.getLetras();
+                    letras_acertadas = p.getLertas_acertadas();
+                    Lnombre.setText("");
+                    h = p.getH();
+                    m = p.getM();
+                    s = p.getS();
+                    PpalabraSecreta.removeAll();
+                    
+                    Limagen.setIcon(p.getImagen().getIcon());
+                    
+                    
+                    for (int j = 0; j < letras_acertadas.size(); j++) {
+                        PpalabraSecreta.add(new JLabel(letras_acertadas.get(j)));
+                    }
+                    Lnombre.setText(p.getNombre());
+                    this.invalidate();
+                    this.validate();
+                    this.repaint();
+                    JOptionPane.showMessageDialog(this, "partida cargada con exito");
+                } catch (IOException ex) {
+                    Logger.getLogger(Ahorcado.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        
+    }//GEN-LAST:event_MenuCargarActionPerformed
+
+    /**
+     * actualiza el tiempo del cronometro
+     */
+    private void cronometro(){
+        String horas = h+"";
+        String minutos = m+"";
+        String segundos = s+"";
+        if (h < 10) {
+            horas = 0+horas;
+        }
+        if (s < 10) {
+            segundos = "0"+segundos;
+        }
+        if (m < 10 ) {
+            minutos = 0+minutos;
+        }
+        Ltiempo.setText("Tiempo jugado: "+horas+":"+minutos+":"+segundos);
+    }
     /**
      * @param args the command line arguments
      */
@@ -923,7 +1075,7 @@ public class Ahorcado extends javax.swing.JFrame {
     private javax.swing.JButton BY;
     private javax.swing.JButton BZ;
     private javax.swing.JButton Bresolver;
-    private javax.swing.JButton Bñ;
+    private javax.swing.JButton BÑ;
     private javax.swing.JLabel Limagen;
     private javax.swing.JLabel Lnombre;
     private javax.swing.JLabel LnombreJuego;
@@ -935,6 +1087,7 @@ public class Ahorcado extends javax.swing.JFrame {
     private javax.swing.JMenuItem MenuGuardar;
     private javax.swing.JMenuItem MenuInformacion;
     private javax.swing.JMenuItem MenuNuevaPartida;
+    private javax.swing.JPanel Pdatos;
     private javax.swing.JPanel Pletras;
     private javax.swing.JPanel PpalabraSecreta;
     private javax.swing.JTextField TFresolver;
@@ -943,7 +1096,6 @@ public class Ahorcado extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;

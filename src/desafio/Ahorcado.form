@@ -39,6 +39,9 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Cargar partida"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MenuCargarActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -133,7 +136,7 @@
         </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jPanel2">
+    <Container class="javax.swing.JPanel" name="Pdatos">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
@@ -185,11 +188,6 @@
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
               <SubComponents>
                 <Container class="javax.swing.JPanel" name="jPanel6">
-                  <Properties>
-                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                      <Border info="null"/>
-                    </Property>
-                  </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
                       <BorderConstraints direction="North"/>
@@ -292,6 +290,7 @@
                         <Component class="javax.swing.JButton" name="BA">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="A"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BAActionPerformed"/>
@@ -300,6 +299,7 @@
                         <Component class="javax.swing.JButton" name="BB">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="B"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BBActionPerformed"/>
@@ -308,6 +308,7 @@
                         <Component class="javax.swing.JButton" name="BC">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="C"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BCActionPerformed"/>
@@ -316,6 +317,7 @@
                         <Component class="javax.swing.JButton" name="BD">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="D"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BDActionPerformed"/>
@@ -324,6 +326,7 @@
                         <Component class="javax.swing.JButton" name="BE">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="E"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BEActionPerformed"/>
@@ -332,6 +335,7 @@
                         <Component class="javax.swing.JButton" name="BF">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="F"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BFActionPerformed"/>
@@ -340,6 +344,7 @@
                         <Component class="javax.swing.JButton" name="BG">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="G"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BGActionPerformed"/>
@@ -348,6 +353,7 @@
                         <Component class="javax.swing.JButton" name="BH">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="H"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BHActionPerformed"/>
@@ -356,6 +362,7 @@
                         <Component class="javax.swing.JButton" name="BI">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="I"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BIActionPerformed"/>
@@ -364,6 +371,7 @@
                         <Component class="javax.swing.JButton" name="BJ">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="J"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BJActionPerformed"/>
@@ -372,6 +380,7 @@
                         <Component class="javax.swing.JButton" name="BK">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="K"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BKActionPerformed"/>
@@ -380,6 +389,7 @@
                         <Component class="javax.swing.JButton" name="BL">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="L"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BLActionPerformed"/>
@@ -388,6 +398,7 @@
                         <Component class="javax.swing.JButton" name="BM">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="M"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BMActionPerformed"/>
@@ -396,22 +407,25 @@
                         <Component class="javax.swing.JButton" name="BN">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="N"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BNActionPerformed"/>
                           </Events>
                         </Component>
-                        <Component class="javax.swing.JButton" name="B&#xf1;">
+                        <Component class="javax.swing.JButton" name="B&#xd1;">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="&#xf1;"/>
+                            <Property name="text" type="java.lang.String" value="&#xd1;"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="B&#xf1;ActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="B&#xd1;ActionPerformed"/>
                           </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="BO">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="O"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BOActionPerformed"/>
@@ -420,6 +434,7 @@
                         <Component class="javax.swing.JButton" name="BP">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="P"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BPActionPerformed"/>
@@ -428,6 +443,7 @@
                         <Component class="javax.swing.JButton" name="BQ">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Q"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BQActionPerformed"/>
@@ -436,6 +452,7 @@
                         <Component class="javax.swing.JButton" name="BR">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="R"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BRActionPerformed"/>
@@ -444,6 +461,7 @@
                         <Component class="javax.swing.JButton" name="BS">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="S"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BSActionPerformed"/>
@@ -452,6 +470,7 @@
                         <Component class="javax.swing.JButton" name="BT">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="T"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BTActionPerformed"/>
@@ -460,6 +479,7 @@
                         <Component class="javax.swing.JButton" name="BU">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="U"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BUActionPerformed"/>
@@ -468,6 +488,7 @@
                         <Component class="javax.swing.JButton" name="BV">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="V"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BVActionPerformed"/>
@@ -476,6 +497,7 @@
                         <Component class="javax.swing.JButton" name="BW">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="W"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BWActionPerformed"/>
@@ -484,6 +506,7 @@
                         <Component class="javax.swing.JButton" name="BX">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="X"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BXActionPerformed"/>
@@ -492,6 +515,7 @@
                         <Component class="javax.swing.JButton" name="BY">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Y"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BYActionPerformed"/>
@@ -500,6 +524,7 @@
                         <Component class="javax.swing.JButton" name="BZ">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Z"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BZActionPerformed"/>
