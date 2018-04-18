@@ -73,7 +73,6 @@ public class Ahorcado extends javax.swing.JFrame {
         h = 0;
         m = 0;
         s = 0;
-        System.out.println(lista_letras);
         
         tiempo = new Timer(1000, accion);
         tiempo.start();
@@ -225,7 +224,7 @@ public class Ahorcado extends javax.swing.JFrame {
             puntos += (lista_letras.size() * (lista_letras.size() - aciertos));
         }
         Lpuntuacion.setText("Puntuacion: " + puntos);
-        System.out.println(aciertos);
+        
         if (aciertos == lista_letras.size() || resolucion) {
             Component b[] = Pletras.getComponents();
             
@@ -233,6 +232,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 b[j].setEnabled(false);
             }
             String opciones[] = {"si", "no"};
+            tiempo.stop();
             int seguir = JOptionPane.showOptionDialog(this, "acertaste la palabra ¿otra partida?"
                     + "", "Fin de ", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[1]);
             if (seguir == 0) {
@@ -278,7 +278,8 @@ public class Ahorcado extends javax.swing.JFrame {
         h = 0;
         s = 0;
         m = 0;
-        System.out.println(lista_letras);
+        
+        tiempo.start();
     }
 
     /**
@@ -927,7 +928,7 @@ public class Ahorcado extends javax.swing.JFrame {
                 guardar.close();
                 flujo.close();
                 JOptionPane.showMessageDialog(this, "partida guardada con exito");
-                tiempo.start();
+                tiempo.restart();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "fallo al cerrar flujo o guardar", "Error", JOptionPane.ERROR_MESSAGE);
             }
